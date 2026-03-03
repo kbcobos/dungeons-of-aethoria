@@ -14,6 +14,7 @@ from utils.display import (
     typewriter, clr, Color, hp_bar, SCREEN_WIDTH
 )
 from utils.save_load import save_game
+from utils.namegen import generate_dungeon_name, generate_floor_name, generate_room_name
 from config import DUNGEON_ROOMS
 
 
@@ -37,6 +38,9 @@ class Room:
     is_last: bool = False
     visited: bool = False
     description: str = ""
+    name: str = ""
+    grid_x: int = 0
+    grid_y: int = 0
 
 
 def generate_floor(floor_number: int) -> list[Room]:
@@ -59,6 +63,9 @@ def generate_floor(floor_number: int) -> list[Room]:
             room_type=rtype,
             is_last=is_last,
             description=_generate_room_description(rtype),
+            name=generate_room_name(rtype),
+            grid_x=(i - 1) % 5,
+            grid_y=(i - 1) // 5,
         ))
     return rooms
 
@@ -121,9 +128,13 @@ def run_dungeon_floor(player: Player) -> str:
     rooms = generate_floor(floor)
 
     _draw_floor_intro(floor, player)
+    _draw_dungeon_map(rooms, current_room=0)
     press_enter()
 
     for room in rooms:
+        _draw_dungeon_map(rooms, current_room=room.number - 1)
+        press_enter(f"  [ Entrando a: {room.name} ]")
+
         result = _enter_room(player, room, floor)
 
         if result == "game_over":
@@ -133,6 +144,16 @@ def run_dungeon_floor(player: Player) -> str:
         if result == "floor_complete":
             player.dungeon_floor += 1
             player.floors_cleared += 1
+            msgs = player.quest_manager.check_and_reward(
+                player,
+                player_kills=player.kills,
+                player_floors=player.floors_cleared,
+                player_level=player.level,
+            )
+            for m in msgs:
+                print_message(m, "good" if "MISIÓN" in m else "normal")
+            if msgs:
+                press_enter()
             return "next_floor"
 
         save_game(player.to_dict())
@@ -181,6 +202,23 @@ def _room_combat(player: Player, floor: int) -> str:
 
     if result == "defeat":
         return "game_over"
+
+    if result == "victory":
+        msgs = player.quest_manager.on_enemy_killed(enemy)
+        msgs += player.quest_manager.check_and_reward(
+            player,
+            player_kills=player.kills,
+            player_floors=player.floors_cleared,
+            player_level=player.level,
+        )
+        for m in msgs:
+            print_message(m, "good" if "MISIÓN" in m else "normal")
+        if any("MISIÓN" in m for m in msgs):
+            press_enter()
+
+    elif result == "fled":
+        player.quest_manager.on_fled_combat()
+
     return "continue"
 
 
@@ -199,6 +237,7 @@ def _room_treasure(player: Player, floor: int) -> str:
     gold_found = random.randint(10 * floor, 30 * floor)
     print_message(f"  Oro: {clr(str(gold_found), Color.YELLOW)} gp. No está nada mal.", "good")
     player.earn_gold(gold_found)
+    player.quest_manager.on_gold_earned(gold_found)
 
     num_items = random.randint(1, 3)
     found_items = random.sample(item_pool, min(num_items, len(item_pool)))
@@ -212,6 +251,8 @@ def _room_treasure(player: Player, floor: int) -> str:
         if choice == 0:
             ok, msg = player.add_to_inventory(item)
             print_message(msg, "good" if ok else "warning")
+            if ok:
+                player.quest_manager.on_item_collected()
 
     press_enter()
     return "continue"
@@ -335,6 +376,7 @@ def _room_trap(player: Player, floor: int) -> str:
     if dex_roll >= threshold:
         typewriter("  ¡Tus reflejos te salvaron! Saltaste justo a tiempo. Que susto, uh.", 0.015)
         print_message("  ¡Trampa evitada! La destreza sirvió para algo.", "good")
+        player.quest_manager.on_trap_avoided()
     else:
         damage = random.randint(5 * floor, 10 * floor)
         actual = player.take_damage(damage)
@@ -494,7 +536,8 @@ def _draw_floor_intro(floor: int, player: Player):
     desc = floor_descriptions.get(floor, f"Floor {floor}: the darkness deepens.")
 
     print(box_top())
-    print(box_row(clr(f"DUNGEON OF AETHORIA — PISO {floor}", Color.MAGENTA), align="center"))
+    floor_name = generate_floor_name(floor)
+    print(box_row(clr(f"PISO {floor} — {floor_name}", Color.MAGENTA), align="center"))
     print(box_separator())
     print(box_row(f"  {desc}"))
     print(box_separator())
@@ -517,6 +560,90 @@ def _draw_room_header(room: Room, floor: int):
     label = type_labels.get(room.room_type, "[ HABITACION ]")
     print()
     print(box_separator())
-    print(box_row(f"  Piso {floor}  |  Habitacion {room.number}/{DUNGEON_ROOMS}  |  {label}"))
+    print(box_row(f"  Piso {floor}  |  Hab. {room.number}/{DUNGEON_ROOMS}  |  {label}"))
+    print(box_row(f"  {clr(room.name, Color.GREY)}"))
     print(box_separator())
     print()
+
+
+def _draw_dungeon_map(rooms: list, current_room: int = -1):
+    """
+    Draw an ASCII map of the current dungeon floor.
+    Shows visited, current, and unknown rooms in a grid.
+    """
+    icons = {
+        "combat":   "[ C ]",
+        "treasure": "[ T ]",
+        "rest":     "[ R ]",
+        "merchant": "[ $ ]",
+        "trap":     "[ X ]",
+        "mystery":  "[ ? ]",
+        "boss":     "[!!!]",
+    }
+    unknown = "[ . ]"
+
+    COLS = 5
+    print()
+    print(box_separator())
+    print(box_row(clr("  MAPA DEL PISO", Color.CYAN)))
+    print(box_separator())
+
+    print(box_row(
+        clr("  C", Color.RED) + "=Combate  " +
+        clr("T", Color.YELLOW) + "=Tesoro  " +
+        clr("R", Color.GREEN) + "=Descanso  " +
+        clr("$", Color.CYAN) + "=Mercader  " +
+        clr("X", Color.MAGENTA) + "=Trampa  " +
+        clr("?", Color.BLUE) + "=Misterio  " +
+        clr("!!!", Color.RED) + "=Jefe"
+    ))
+    print(box_row(""))
+
+    num_rows = (len(rooms) + COLS - 1) // COLS
+    for row in range(num_rows):
+        row_str = "  "
+        for col in range(COLS):
+            idx = row * COLS + col
+            if idx >= len(rooms):
+                row_str += "      "
+                continue
+            room = rooms[idx]
+            room_num = idx
+
+            if room_num == current_room:
+                icon = clr(f"[{room.number:2d}*]", Color.YELLOW)
+            elif room.visited:
+                raw_icon = icons.get(room.room_type, "[ ? ]")
+                type_colors = {
+                    "combat":   Color.RED,
+                    "treasure": Color.YELLOW,
+                    "rest":     Color.GREEN,
+                    "merchant": Color.CYAN,
+                    "trap":     Color.MAGENTA,
+                    "mystery":  Color.BLUE,
+                    "boss":     Color.RED,
+                }
+                color = type_colors.get(room.room_type, Color.WHITE)
+                icon = clr(raw_icon, color)
+            else:
+                icon = clr(unknown, Color.GREY)
+
+            if col < COLS - 1 and idx + 1 < len(rooms):
+                connector = clr("-", Color.GREY)
+            else:
+                connector = " "
+
+            row_str += icon + connector
+
+        print(box_row(row_str))
+
+        if row < num_rows - 1:
+            vert_row = "  "
+            for col in range(COLS):
+                idx = row * COLS + col
+                if idx < len(rooms):
+                    vert_row += clr("  |  ", Color.GREY) + " "
+            print(box_row(vert_row))
+
+    print(box_row(""))
+    print(box_separator())
