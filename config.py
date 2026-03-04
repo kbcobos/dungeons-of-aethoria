@@ -14,8 +14,14 @@ def setup_terminal():
 
 GAME_TITLE   = "DUNGEONS OF AETHORIA"
 GAME_VERSION = "1.0"
-SAVE_DIR     = os.path.join(os.path.dirname(__file__), "saves")
-SAVE_FILE    = os.path.join(SAVE_DIR, "save_game.json")
+
+if getattr(sys, "frozen", False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+SAVE_DIR  = os.path.join(BASE_DIR, "saves")
+SAVE_FILE = os.path.join(SAVE_DIR, "save_game.json")
 
 SCREEN_WIDTH = 62
 
@@ -40,6 +46,7 @@ class Color:
     WHITE   = "\033[37m"
     GREY    = "\033[90m"
 
+    @staticmethod
     def supported() -> bool:
         """Check if the terminal likely supports ANSI codes."""
         if sys.platform == "win32":
