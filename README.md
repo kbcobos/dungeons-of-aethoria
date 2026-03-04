@@ -157,6 +157,23 @@ Partida 3 → "The Wretched Lair of Vorazoth"  —  "The Bleeding Hall"
 
 ---
 
+## Compilar a ejecutable
+
+Requiere PyInstaller instalado:
+```bash
+pip install pyinstaller
+```
+
+Luego desde la raíz del proyecto:
+```bash
+python build.py
+```
+
+El ejecutable queda en `dist/dungeons-of-aethoria.exe` (Windows) o `dist/dungeons-of-aethoria` (Mac/Linux).
+El usuario final no necesita tener Python instalado para ejecutarlo.
+
+---
+
 ## Licencia
 
 MIT License — hacé lo que quieras con el código, solo dejá el crédito.
