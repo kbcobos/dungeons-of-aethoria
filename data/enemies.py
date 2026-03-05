@@ -32,7 +32,7 @@ ENEMIES = {
 
 "goblin": EnemyTemplate(
     key="goblin", name="Goblin Scout", tier=1, art_key="goblin",
-    description="Un goblin flacucho y verdoso con un cuchillo más oxidado que los caños de tu edificio. Parece que no comió en tres días. Igual te va a atacar.",
+    description="desc_goblin",
     hp=35, mp=0, attack=8, defense=3, speed=12,
     xp_reward=40, gold_min=3, gold_max=12,
     str_stat=7, dex_stat=12, int_stat=5,
@@ -46,7 +46,7 @@ ENEMIES = {
 
 "goblin_shaman": EnemyTemplate(
     key="goblin_shaman", name="Goblin Shaman", tier=1, art_key="goblin",
-    description="Un goblin jorobado con huesos colgando por todos lados. Claramente el intelectual del grupo. Eso no lo hace menos peligroso, sí más raro.",
+    description="desc_goblin_shaman",
     hp=28, mp=40, attack=6, defense=2, speed=9,
     xp_reward=55, gold_min=5, gold_max=18,
     str_stat=5, dex_stat=9, int_stat=12,
@@ -60,7 +60,7 @@ ENEMIES = {
 
 "giant_rat": EnemyTemplate(
     key="giant_rat", name="Giant Dungeon Rat", tier=1, art_key="goblin",
-    description="Una rata del tamaño de un perro mediano. La encontraste en la mazmorra pero podría ser perfectamente del subte de la línea B.",
+    description="desc_giant_rat",
     hp=25, mp=0, attack=7, defense=2, speed=15,
     xp_reward=25, gold_min=0, gold_max=5,
     str_stat=8, dex_stat=14, int_stat=2,
@@ -74,7 +74,7 @@ ENEMIES = {
 
 "skeleton": EnemyTemplate(
     key="skeleton", name="Risen Skeleton", tier=1, art_key="skeleton",
-    description="Huesos pegados con magia oscura y ganas de molestar. El cuchillo está más oxidado que una heladera de los 90. Pero igual duele.",
+    description="desc_skeleton",
     hp=40, mp=0, attack=9, defense=5, speed=7,
     xp_reward=50, gold_min=2, gold_max=10,
     str_stat=9, dex_stat=6, int_stat=3,
@@ -90,7 +90,7 @@ ENEMIES = {
 
 "orc": EnemyTemplate(
     key="orc", name="Orc Warrior", tier=2, art_key="orc",
-    description="Un orco enorme con colmillos y una armadura de hierro que claramente no limpió nunca. Huele a sangre y a algo que preferís no identificar.",
+    description="desc_orc",
     hp=80, mp=0, attack=14, defense=8, speed=8,
     xp_reward=90, gold_min=10, gold_max=30,
     str_stat=15, dex_stat=7, int_stat=5,
@@ -105,7 +105,7 @@ ENEMIES = {
 
 "dark_elf": EnemyTemplate(
     key="dark_elf", name="Dark Elf Assassin", tier=2, art_key="goblin",
-    description="Una figura elegante de seda negra con dos dagas envenenadas. Vestida mejor que vos. Mucho mejor. Algo que también duele, pero diferente.",
+    description="desc_dark_elf",
     hp=60, mp=30, attack=15, defense=6, speed=18,
     xp_reward=100, gold_min=15, gold_max=45,
     str_stat=10, dex_stat=16, int_stat=12,
@@ -120,7 +120,7 @@ ENEMIES = {
 
 "zombie_knight": EnemyTemplate(
     key="zombie_knight", name="Zombie Knight", tier=2, art_key="skeleton",
-    description="Fue noble, ahora es un horror podrido con armadura oxidada. Igual tiene más postura que la mayoría. La muerte no le quitó el porte, lamentablemente.",
+    description="desc_zombie_knight",
     hp=95, mp=0, attack=13, defense=12, speed=5,
     xp_reward=110, gold_min=20, gold_max=50,
     str_stat=14, dex_stat=5, int_stat=2,
@@ -135,7 +135,7 @@ ENEMIES = {
 
 "witch": EnemyTemplate(
     key="witch", name="Dungeon Witch", tier=2, art_key="witch",
-    description="Una bruja riéndose sola rodeada de humo verde. El caldero burbujea con algo que definitivamente no es mate. Claramente le va bien en lo suyo.",
+    description="desc_dungeon_witch",
     hp=55, mp=80, attack=11, defense=5, speed=10,
     xp_reward=105, gold_min=12, gold_max=40,
     str_stat=6, dex_stat=9, int_stat=15,
@@ -151,7 +151,7 @@ ENEMIES = {
 
 "vampire": EnemyTemplate(
     key="vampire", name="Vampire Lord", tier=3, art_key="vampire",
-    description="Pálido, frío y con aires de superioridad. Tiene siglos de experiencia haciéndote sentir inferior. Como ese compañero de trabajo pero con colmillos.",
+    description="desc_vampire",
     hp=130, mp=60, attack=18, defense=10, speed=16,
     xp_reward=200, gold_min=40, gold_max=100,
     str_stat=16, dex_stat=14, int_stat=14,
@@ -167,7 +167,7 @@ ENEMIES = {
 
 "stone_golem": EnemyTemplate(
     key="stone_golem", name="Stone Golem", tier=3, art_key="orc",
-    description="Dos metros y medio de granito animado con runas brillando en el pecho. No corre. No habla. No negocia. Simplemente viene hacia vos. Tranquilamente.",
+    description="desc_stone_golem",
     hp=160, mp=20, attack=20, defense=18, speed=4,
     xp_reward=220, gold_min=30, gold_max=80,
     str_stat=20, dex_stat=3, int_stat=4,
@@ -182,7 +182,7 @@ ENEMIES = {
 
 "demon": EnemyTemplate(
     key="demon", name="Lesser Demon", tier=3, art_key="demon",
-    description="Una criatura de fuego y odio puro con alas de cuero quemado. Tiene los ojos como brasas y la actitud de alguien a quien le cancelaron el vuelo y perdió las valijas.",
+    description="desc_lesser_demon",
     hp=120, mp=70, attack=19, defense=9, speed=14,
     xp_reward=230, gold_min=35, gold_max=90,
     str_stat=17, dex_stat=13, int_stat=13,
@@ -199,7 +199,7 @@ ENEMIES = {
 "dragon": EnemyTemplate(
     key="dragon", name="Aethoran Dragon", tier=4, art_key="dragon",
     is_boss=True,
-    description="Un dragón enorme. En serio, es GRANDE. No, más grande que eso. Llevás toda la mazmorra pensando que el final iba a ser manejable. Error de cálculo.",
+    description="desc_dragon",
     hp=400, mp=150, attack=30, defense=20, speed=12,
     xp_reward=1000, gold_min=200, gold_max=500,
     str_stat=25, dex_stat=12, int_stat=18,
@@ -220,7 +220,7 @@ ENEMIES = {
 "lich": EnemyTemplate(
     key="lich", name="The Lich Archmage", tier=4, art_key="skeleton",
     is_boss=True, is_undead=True,
-    description="Fue el mejor mago del mundo y eligió la inmortalidad. Ahora es un esqueleto con actitud. Morirse hubiera sido más elegante, pero nadie le preguntó.",
+    description="desc_lich",
     hp=300, mp=300, attack=25, defense=14, speed=10,
     xp_reward=900, gold_min=150, gold_max=400,
     str_stat=8, dex_stat=10, int_stat=22,
@@ -240,7 +240,7 @@ ENEMIES = {
 "ancient_demon": EnemyTemplate(
     key="ancient_demon", name="Archfiend Malachar", tier=4, art_key="demon",
     is_boss=True,
-    description="El verdadero dueño de la mazmorra. Tres siglos encerrado acá abajo. Está de mal humor, con razón. Vos sos lo primero que va a ver al salir. Mala suerte.",
+    description="desc_archfiend",
     hp=500, mp=200, attack=35, defense=22, speed=15,
     xp_reward=2000, gold_min=300, gold_max=800,
     str_stat=22, dex_stat=15, int_stat=20,
