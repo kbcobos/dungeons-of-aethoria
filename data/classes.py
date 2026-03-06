@@ -54,13 +54,13 @@ _reg(ClassTemplate(
     lore="lore_guerrero",
     abilities=[
         Ability("ab_guerrero_1_name", "ab_guerrero_1_desc",
-                "With a savage roar, {name} delivers a crushing blow that splits iron and bone alike!",
+                "narr_guerrero_1",
                 mp_cost=5, damage_base=15, damage_scale=1.5, stat_used="str"),
         Ability("ab_guerrero_2_name", "ab_guerrero_2_desc",
-                "{name} grits their teeth against the pain, drawing upon reserves of iron will to endure!",
+                "narr_guerrero_2",
                 mp_cost=8, heal_amount=30, effect=""),
         Ability("ab_guerrero_3_name", "ab_guerrero_3_desc",
-                "{name} spins in a deadly arc, their blade singing through the air!",
+                "narr_guerrero_3",
                 mp_cost=12, damage_base=10, damage_scale=1.2, stat_used="str", effect="aoe"),
     ]
 ))
@@ -75,13 +75,13 @@ _reg(ClassTemplate(
     lore="lore_mago",
     abilities=[
         Ability("ab_mago_1_name", "ab_mago_1_desc",
-                "With a sharp incantation, {name} hurls a roaring sphere of fire that scorches all in its path!",
+                "narr_mago_1",
                 mp_cost=15, damage_base=25, damage_scale=2.0, stat_used="int", effect="burn"),
         Ability("ab_mago_2_name", "ab_mago_2_desc",
-                "{name} mutters a ward of protection, weaving a shimmering barrier from the aether!",
+                "narr_mago_2",
                 mp_cost=10, heal_amount=20, effect="shield"),
         Ability("ab_mago_3_name", "ab_mago_3_desc",
-                "{name} channels raw arcane energy into a searing bolt that tears through magical resistance!",
+                "narr_mago_3",
                 mp_cost=20, damage_base=30, damage_scale=2.2, stat_used="int"),
     ]
 ))
@@ -96,13 +96,13 @@ _reg(ClassTemplate(
     lore="lore_picaro",
     abilities=[
         Ability("ab_picaro_1_name", "ab_picaro_1_desc",
-                "{name} materializes from the darkness, driving twin blades deep into a vital spot!",
+                "narr_picaro_1",
                 mp_cost=8, damage_base=20, damage_scale=1.8, stat_used="dex"),
         Ability("ab_picaro_2_name", "ab_picaro_2_desc",
-                "{name}'s blade drips with foul venom as it finds its mark, promising slow suffering!",
+                "narr_picaro_2",
                 mp_cost=6, damage_base=8, damage_scale=1.0, stat_used="dex", effect="poison"),
         Ability("ab_picaro_3_name", "ab_picaro_3_desc",
-                "{name} becomes a blur of motion, vanishing from sight like smoke in the wind!",
+                "narr_picaro_3",
                 mp_cost=5, effect="evade"),
     ]
 ))
@@ -117,13 +117,13 @@ _reg(ClassTemplate(
     lore="lore_paladin",
     abilities=[
         Ability("ab_paladin_1_name", "ab_paladin_1_desc",
-                "{name} calls upon the power of the Light! A blinding radiance erupts from their weapon!",
+                "narr_paladin_1",
                 mp_cost=12, damage_base=18, damage_scale=1.6, stat_used="cha", effect="holy"),
         Ability("ab_paladin_2_name", "ab_paladin_2_desc",
-                "{name} places a gauntleted hand upon their wounds. Golden light flows — flesh knits whole.",
+                "narr_paladin_2",
                 mp_cost=15, heal_amount=40),
         Ability("ab_paladin_3_name", "ab_paladin_3_desc",
-                "{name} radiates a holy aura that drives back shadow and blunts the edge of evil!",
+                "narr_paladin_3",
                 mp_cost=18, effect="aura"),
     ]
 ))
@@ -138,13 +138,13 @@ _reg(ClassTemplate(
     lore="lore_arquero",
     abilities=[
         Ability("ab_arquero_1_name", "ab_arquero_1_desc",
-                "{name} draws three arrows in a single fluid motion and looses them in a deadly fan!",
+                "narr_arquero_1",
                 mp_cost=8, damage_base=10, damage_scale=1.3, stat_used="dex", effect="multi"),
         Ability("ab_arquero_2_name", "ab_arquero_2_desc",
-                "{name} draws deep, narrows their eye, and fires — the shaft punches through steel plate!",
+                "narr_arquero_2",
                 mp_cost=10, damage_base=22, damage_scale=1.5, stat_used="dex"),
         Ability("ab_arquero_3_name", "ab_arquero_3_desc",
-                "{name} studies their foe with a predator's patience, finding the gap in every guard.",
+                "narr_arquero_3",
                 mp_cost=7, effect="analyze"),
     ]
 ))
@@ -159,13 +159,13 @@ _reg(ClassTemplate(
     lore="lore_barbaro",
     abilities=[
         Ability("ab_barbaro_1_name", "ab_barbaro_1_desc",
-                "{name} lets out a battle cry that shakes the very stones! Blood-rage takes hold!",
+                "narr_barbaro_1",
                 mp_cost=5, effect="rage"),
         Ability("ab_barbaro_2_name", "ab_barbaro_2_desc",
-                "{name} heaves their axe in a devastating overhead arc that shakes the earth on impact!",
+                "narr_barbaro_2",
                 mp_cost=8, damage_base=30, damage_scale=2.0, stat_used="str", effect="stun"),
         Ability("ab_barbaro_3_name", "ab_barbaro_3_desc",
-                "{name}'s muscles tighten and their skin seems to harden like ancient bark and iron!",
+                "narr_barbaro_3",
                 mp_cost=6, effect="shield"),
     ]
 ))
@@ -180,13 +180,13 @@ _reg(ClassTemplate(
     lore="lore_monje",
     abilities=[
         Ability("ab_monje_1_name", "ab_monje_1_desc",
-                "{name} becomes a whirlwind of fists and feet — five perfect strikes in the span of a breath!",
+                "narr_monje_1",
                 mp_cost=10, damage_base=7, damage_scale=1.2, stat_used="dex", effect="multi"),
         Ability("ab_monje_2_name", "ab_monje_2_desc",
-                "{name} steadies their breathing, channels inner chi, and closes their wounds through will alone.",
+                "narr_monje_2",
                 mp_cost=12, heal_amount=25),
         Ability("ab_monje_3_name", "ab_monje_3_desc",
-                "{name} strikes a precise nerve cluster — the enemy's limbs betray them entirely!",
+                "narr_monje_3",
                 mp_cost=8, damage_base=12, damage_scale=1.0, stat_used="wis", effect="stun"),
     ]
 ))
@@ -201,13 +201,13 @@ _reg(ClassTemplate(
     lore="lore_explorador",
     abilities=[
         Ability("ab_explorador_1_name", "ab_explorador_1_desc",
-                "{name} brands their quarry with a hunter's mark — every blow will find its way true!",
+                "narr_explorador_1",
                 mp_cost=6, damage_base=5, damage_scale=0.8, stat_used="wis", effect="mark"),
         Ability("ab_explorador_2_name", "ab_explorador_2_desc",
-                "{name} flows through a practiced dual-strike — blade and dagger in perfect sequence!",
+                "narr_explorador_2",
                 mp_cost=8, damage_base=12, damage_scale=1.4, stat_used="dex", effect="multi"),
         Ability("ab_explorador_3_name", "ab_explorador_3_desc",
-                "{name} studies their foe with a predator's patience, finding the gap in every guard.",
+                "narr_arquero_3",
                 mp_cost=7, effect="analyze"),
     ]
 ))
@@ -222,13 +222,13 @@ _reg(ClassTemplate(
     lore="lore_hechicero",
     abilities=[
         Ability("ab_hechicero_1_name", "ab_hechicero_1_desc",
-                "{name} releases a torrent of raw chaos! The air cracks and reality screams!",
+                "narr_hechicero_1",
                 mp_cost=14, damage_base=20, damage_scale=2.1, stat_used="int", effect="chaos"),
         Ability("ab_hechicero_2_name", "ab_hechicero_2_desc",
-                "{name} twists the weave of magic itself, bending the laws of the arcane to their will!",
+                "narr_hechicero_2",
                 mp_cost=16, effect="empower"),
         Ability("ab_hechicero_3_name", "ab_hechicero_3_desc",
-                "{name} detonates a pulse of raw magical energy that warps space in a visible shockwave!",
+                "narr_hechicero_3",
                 mp_cost=18, damage_base=22, damage_scale=1.8, stat_used="int", effect="stun"),
     ]
 ))
@@ -243,13 +243,13 @@ _reg(ClassTemplate(
     lore="lore_brujo",
     abilities=[
         Ability("ab_brujo_1_name", "ab_brujo_1_desc",
-                "{name}'s eyes go black as they speak syllables from no human tongue — a curse takes root!",
+                "narr_brujo_1",
                 mp_cost=10, damage_base=18, damage_scale=1.7, stat_used="cha", effect="curse"),
         Ability("ab_brujo_2_name", "ab_brujo_2_desc",
-                "{name} reaches across reality itself, fingers touching something that should not exist...",
+                "narr_brujo_2",
                 mp_cost=14, damage_base=15, damage_scale=1.5, stat_used="cha", effect="drain"),
         Ability("ab_brujo_3_name", "ab_brujo_3_desc",
-                "The air turns cold and sulfurous as {name}'s dark patron manifests its terrible attention!",
+                "narr_brujo_3",
                 mp_cost=22, damage_base=35, damage_scale=2.0, stat_used="cha", cooldown=3),
     ]
 ))
