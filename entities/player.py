@@ -1,3 +1,5 @@
+from utils.lang import t
+
 import math
 from entities.character import Character
 from data.classes import ClassTemplate, Ability, CLASSES
@@ -33,7 +35,7 @@ class Player(Character):
         self.level = 1
         self.xp = 0
         self.xp_to_next = XP_BASE
-        self.gold = 50
+        self.gold = 100
 
         self.inventory: list[Item] = []
         self.equipped_weapon: Item | None = None
@@ -164,16 +166,15 @@ class Player(Character):
         """
         messages = []
         self.xp += amount
-        messages.append(f"  Ganaste {amount} puntos de experiencia. Algo aprendiste.")
+        messages.append(t("combat_xp_gain", amount=amount))
 
         while self.xp >= self.xp_to_next and self.level < MAX_LEVEL:
             self.xp -= self.xp_to_next
             self._level_up()
             messages.append(f"")
-            messages.append(f"  *** SUBISTE DE NIVEL, CAMPEÓN! Sos nivel {self.level} ahora! ***")
-            messages.append(f"  HP: +{self.char_class.hp_per_level}  |  "
-                            f"MP: +{self.char_class.mp_per_level}  |  Te sentís posta.")
-            messages.append(f"  Tu poder creció. La oscuridad retrocede. Por ahora. Disfrutalo.")
+            messages.append(t("combat_level_up", level=self.level))
+            messages.append(t("combat_level_stats", hp=self.char_class.hp_per_level, mp=self.char_class.mp_per_level))
+            messages.append(t("combat_level_flavor"))
             self.xp_to_next = int(XP_BASE * (self.level ** 1.4))
 
         return messages
