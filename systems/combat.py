@@ -10,6 +10,7 @@ from utils.display import (
     print_ascii_enemy, typewriter, clr, Color, SCREEN_WIDTH
 )
 from config import FLEE_BASE_CHANCE
+from utils.lang import t
 
 
 def run_combat(player: Player, enemy: Enemy) -> str:
@@ -19,7 +20,7 @@ def run_combat(player: Player, enemy: Enemy) -> str:
     """
     print()
     _draw_encounter_intro(enemy)
-    press_enter("  [ El combate comienza... ]")
+    press_enter(t("combat_start"))
 
     turn = 1
     player_evading = False
@@ -41,7 +42,7 @@ def run_combat(player: Player, enemy: Enemy) -> str:
         result = _player_turn(player, enemy, turn)
 
         if result == "fled":
-            print_message("Salís rajando. Sin vergüenza. Estrategia completamente válida.", "warning")
+            print_message(t("combat_flee_success"), "warning")
             press_enter()
             return "fled"
 
@@ -69,14 +70,14 @@ def _player_turn(player: Player, enemy: Enemy, turn: int) -> str:
     """Handle a complete player turn. Returns 'action' | 'fled'."""
 
     options = [
-        f"Atacar          [ ATK: {player.effective_attack} ]",
-        "Usar Habilidad",
-        "Usar Pocion",
-        "Inventario rapido",
-        "Huir",
+        f"{t('combat_action_attack')}  [ ATK: {player.effective_attack} ]",
+        t("combat_action_ability"),
+        t("combat_action_potion"),
+        t("combat_quick_status"),
+        t("combat_action_flee"),
     ]
 
-    choice = prompt_choice(options, "Tu turno")
+    choice = prompt_choice(options, t("combat_your_action"))
 
     if choice == 0:
         _player_basic_attack(player, enemy)
@@ -98,7 +99,7 @@ def _player_turn(player: Player, enemy: Enemy, turn: int) -> str:
     elif choice == 4:
         if _attempt_flee(player, enemy):
             return "fled"
-        print_message("El paso te cortó, che. No hay forma de zafar.", "bad")
+        print_message(t("combat_flee_fail"), "bad")
 
     return "action"
 
@@ -115,7 +116,7 @@ def _player_basic_attack(player: Player, enemy: Enemy):
     )
 
     if critical:
-        typewriter(f"  ¡Golpe crítico! Encontraste el punto débil. Buena puntería.", 0.015)
+        typewriter(f"  {t('combat_critical')}", 0.015)
     actual = enemy.take_damage(damage)
     _flash_damage(enemy.name, actual, critical)
 
@@ -125,7 +126,7 @@ def _player_use_ability(player: Player, enemy: Enemy) -> bool:
     available = player.get_available_abilities()
 
     if not available:
-        print_message("No tenés habilidades disponibles. O están en cooldown. O las dos cosas.", "warning")
+        print_message(t("combat_no_abilities"), "warning")
         press_enter()
         return False
 
@@ -135,10 +136,10 @@ def _player_use_ability(player: Player, enemy: Enemy) -> bool:
         cd = player.cooldowns.get(ab.name, 0)
         cd_str = f" [CD: {cd}]" if cd > 0 else ""
         cost_str = clr(f"[{ab.mp_cost} MP]", Color.BLUE)
-        ability_options.append(f"{ab.name}  {cost_str}{cd_str}")
-    ability_options.append("-- Cancelar --")
+        ability_options.append(f"{t(ab.name)}  {cost_str}{cd_str}")
+    ability_options.append(t("combat_cancel"))
 
-    choice = prompt_choice(ability_options, "Habilidad")
+    choice = prompt_choice(ability_options, t("combat_ability_prompt"))
     if choice == len(ability_options) - 1:
         return False
 
@@ -155,14 +156,14 @@ def _player_use_ability(player: Player, enemy: Enemy) -> bool:
 
 def _execute_player_ability(player: Player, enemy: Enemy, ability: Ability):
     """Resolve ability effects on the enemy."""
-    narrative = ability.narrative.format(name=player.name)
+    narrative = t(ability.narrative).format(name=player.name)
     print()
     typewriter(f"  {narrative}", 0.014)
     print()
 
     if ability.heal_amount > 0:
         restored = player.heal(ability.heal_amount)
-        print_message(f"You recover {restored} HP.", "good")
+        print_message(t("combat_heal_recover", n=restored), "good")
 
     if ability.damage_base > 0:
         stat_val = player.stat_by_name(ability.stat_used)
@@ -177,13 +178,13 @@ def _player_use_potion(player: Player) -> bool:
     """Quick-use a potion from inventory."""
     potions = [i for i in player.inventory if i.item_type == "potion"]
     if not potions:
-        print_message("No tenés pociones. Previsión cero.", "warning")
+        print_message(t("combat_no_potions"), "warning")
         press_enter()
         return False
 
     options = [f"{p.name}  (HP+{p.heal_hp}  MP+{p.heal_mp})" for p in potions]
-    options.append("-- Cancelar --")
-    choice = prompt_choice(options, "Usar pocion")
+    options.append(t("combat_cancel"))
+    choice = prompt_choice(options, t("combat_use_potion"))
 
     if choice == len(options) - 1:
         return False
@@ -197,7 +198,7 @@ def _player_quick_inventory(player: Player):
     """View stats and active effects (no item use)."""
     print()
     print(box_top(44))
-    print(box_row(clr("ESTADO RÁPIDO", Color.YELLOW), width=44, align="center"))
+    print(box_row(clr(t("combat_quick_status"), Color.YELLOW), width=44, align="center"))
     print(box_separator(44))
     print(box_row(f"  Nivel: {player.level}  |  Oro: {player.gold} gp", width=44))
     print(box_row(f"  HP : {hp_bar(player.current_hp, player.max_hp, 15)}", width=44))
@@ -239,7 +240,7 @@ def _enemy_turn(enemy: Enemy, player: Player):
         if actual == 0:
             print_message("¡Tu evasión funcionó! El ataque pasó a centímetros. Suertudo.", "good")
         else:
-            print_message(f"You take {clr(str(actual), Color.RED)} damage!", "bad")
+            print_message(f"-{clr(str(actual), Color.RED)} HP", "bad")
 
     elif action["type"] == "ability":
         ability_name = action["ability_name"]
@@ -252,9 +253,9 @@ def _enemy_turn(enemy: Enemy, player: Player):
         raw_dmg = int(enemy.effective_attack * multiplier)
         actual  = player.take_damage(raw_dmg)
         if actual == 0:
-            print_message("¡Evasión exitosa! La habilidad pasó sin tocarte. De nada.", "good")
+            print_message(t("combat_evade_ability"), "good")
         else:
-            print_message(f"You take {clr(str(actual), Color.RED)} damage!", "bad")
+            print_message(f"-{clr(str(actual), Color.RED)} HP", "bad")
 
         _apply_combat_effect(effect, enemy, player)
 
@@ -292,9 +293,9 @@ def _flash_damage(target_name: str, damage: int, critical: bool):
     """Print damage notification."""
     dmg_str = clr(str(damage), Color.RED)
     if critical:
-        print_message(f"CRITICAL! {target_name} takes {dmg_str} damage!", "bad")
+        print_message(f"{t('combat_enemy_critical')} {target_name} — {dmg_str} HP", "bad")
     else:
-        print_message(f"{target_name} takes {dmg_str} damage.", "normal")
+        print_message(f"{target_name} — {dmg_str} HP", "normal")
 
 
 def _apply_combat_effect(effect: str, source, target):
@@ -333,14 +334,14 @@ def _apply_combat_effect(effect: str, source, target):
     if status_name and duration > 0:
         actual_target.add_status(status_name, duration, value)
         if actual_target == target:
-            print_message(f"{target.name} is {label}", "bad")
+            print_message(f"{target.name}: {label}", "bad")
         else:
             print_message(f"{source.name}: {label}", "good")
 
     if effect == "drain" and target != source:
         drain_hp = max(1, int(target.max_hp * 0.08))
         source.heal(drain_hp)
-        print_message(f"{source.name} drains {drain_hp} HP!", "bad")
+        print_message(f"{source.name}: -{drain_hp} HP", "bad")
 
 
 def _attempt_flee(player: Player, enemy: Enemy) -> bool:
@@ -355,7 +356,7 @@ def _victory(player: Player, enemy: Enemy) -> str:
     """Handle post-combat victory: XP, gold, loot."""
     print()
     print(clr("  " + "=" * 56, Color.GREEN))
-    typewriter(f"  VICTORIA! El {enemy.name} cayó. Bien ahí.", 0.02)
+    typewriter(f"  {t('combat_victory', enemy=enemy.name)}", 0.02)
     print(clr("  " + "=" * 56, Color.GREEN))
     print()
 
@@ -367,13 +368,13 @@ def _victory(player: Player, enemy: Enemy) -> str:
         if "***" in msg:
             time.sleep(0.4)
 
-    print_message(f"  Encontrás {clr(str(enemy.gold_reward), Color.YELLOW)} monedas de oro. No está mal.", "good")
+    print_message(f"  {t('combat_gold_found', amount=clr(str(enemy.gold_reward), Color.YELLOW))}", "good")
     player.earn_gold(enemy.gold_reward)
 
     loot = enemy.generate_loot()
     for item in loot:
         ok, msg = player.add_to_inventory(item)
-        print_message(f"  Objeto encontrado: {clr(item.name, Color.CYAN)} — {msg}", "good")
+        print_message(f"  {t('combat_item_found', item=clr(item.name, Color.CYAN), msg=msg)}", "good")
 
     player.remove_status("rage")
     player.remove_status("empower")
@@ -387,17 +388,17 @@ def _defeat(player: Player, enemy: Enemy) -> str:
     """Handle defeat screen."""
     print()
     print(clr("  " + "=" * 56, Color.RED))
-    typewriter(f"  Caíste. La mazmorra se comió otro gil. Eso es todo.", 0.025)
+    typewriter(f"  {t('combat_defeat')}", 0.025)
     print(clr("  " + "=" * 56, Color.RED))
     print()
-    print_message(f"  Te liquidó: {enemy.name}", "bad")
-    print_message(f"  Nivel que llegaste: {player.level}", "system")
-    print_message(f"  Enemigos eliminados: {player.kills}", "system")
-    print_message(f"  Oro que llevabas: {player.gold} gp. Ahora es de la mazmorra.", "system")
+    print_message(t("combat_slain_by", enemy=enemy.name), "bad")
+    print_message(t("combat_level_reached", level=player.level), "system")
+    print_message(t("combat_kills", kills=player.kills), "system")
+    print_message(t("combat_gold_grave", gold=player.gold), "system")
     print()
-    typewriter("  Los calabozos de Aethoria se tragaron otra alma. Como siempre.", 0.02)
+    typewriter(f"  {t('combat_dungeon_claims')}", 0.02)
     print()
-    press_enter("  [ Presioná ENTER para continuar, si te animás ]")
+    press_enter(t("combat_press_enter"))
     return "defeat"
 
 
@@ -418,7 +419,7 @@ def _draw_encounter_intro(enemy: Enemy):
 def _draw_combat_status(player: Player, enemy: Enemy, turn: int):
     """Draw both combatant status bars."""
     print(box_top())
-    print(box_row(clr(f"  TURNO {turn}", Color.GREY), align="left"))
+    print(box_row(clr(f"  {t('combat_turn')} {turn}", Color.GREY), align="left"))
     print(box_separator())
 
     p_name = clr(f"{player.name} ({player.char_class.name})", Color.GREEN)
