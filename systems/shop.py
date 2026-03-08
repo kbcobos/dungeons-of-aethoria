@@ -1,5 +1,6 @@
 import random
 from data.items import ALL_ITEMS, Item, WEAPONS, ARMORS, POTIONS
+from utils.lang import t, item_desc
 from utils.display import (
     box_top, box_bottom, box_row, box_separator,
     print_message, prompt_choice, press_enter, clr, Color
@@ -50,7 +51,7 @@ def show_shop(player) -> None:
     if not player.shop_stock or refresh_needed(player):
         player.shop_stock = generate_shop_stock(player.dungeon_floor)
         player.shop_last_refresh = player.dungeon_floor
-        print_message("El stock de la tienda se renovó. Llegaron novedades.", "system")
+        print_message(t("shop_refreshed"), "system")
 
     while True:
         _draw_shop(player)
@@ -69,14 +70,14 @@ def _draw_shop(player) -> None:
     """Render the permanent shop UI."""
     print()
     print(box_top())
-    print(box_row(clr("TIENDA DE AVENTUREROS — AETHORIA", Color.YELLOW), align="center"))
+    print(box_row(clr(t("shop_title"), Color.YELLOW), align="center"))
     print(box_separator())
-    print(box_row(clr('  "Precios honestos. Mayormente. Bueno, razonables."', Color.GREY)))
+    print(box_row(clr(t("shop_tagline"), Color.GREY)))
     print(box_separator())
     print(box_row(f"  Tu oro: {clr(str(player.gold), Color.YELLOW)} gp  |  "
                   f"Piso actual: {player.dungeon_floor}"))
     print(box_separator())
-    print(box_row(clr("  STOCK DISPONIBLE:", Color.CYAN)))
+    print(box_row(clr(f"  {t('shop_stock_label')}", Color.CYAN)))
     print()
 
     rarity_colors = {
@@ -87,7 +88,7 @@ def _draw_shop(player) -> None:
     }
 
     if not player.shop_stock:
-        print(box_row(clr("  Sin stock. Volvé mañana.", Color.GREY)))
+        print(box_row(clr(t("shop_no_stock"), Color.GREY)))
     else:
         for i, key in enumerate(player.shop_stock, 1):
             item = ALL_ITEMS.get(key)
@@ -98,10 +99,19 @@ def _draw_shop(player) -> None:
             name_str  = clr(f"{item.name}", rarity_color)
             price_str = clr(f"{price}gp", Color.YELLOW)
             type_str  = clr(f"[{item.item_type}]", Color.GREY)
-            rar_str   = clr(f"[{item.rarity}]", rarity_color)
-
-            affordable = "" if player.gold >= price else clr("  (sin guita)", Color.RED)
-            print(box_row(f"  {i:2}. {name_str:28s}  {price_str:8s}  {type_str} {rar_str}{affordable}"))
+            affordable = "" if player.gold >= price else clr(f"  {t('shop_no_afford')}", Color.RED)
+            stats = []
+            if item.attack_bonus:  stats.append(f"ATK+{item.attack_bonus}")
+            if item.defense_bonus: stats.append(f"DEF+{item.defense_bonus}")
+            if item.heal_hp:       stats.append(f"HP+{item.heal_hp}")
+            if item.heal_mp:       stats.append(f"MP+{item.heal_mp}")
+            if item.str_bonus:     stats.append(f"FUE+{item.str_bonus}")
+            if item.dex_bonus:     stats.append(f"DES+{item.dex_bonus}")
+            if item.int_bonus:     stats.append(f"INT+{item.int_bonus}")
+            stat_str = clr("  " + "  ".join(stats), Color.GREEN) if stats else ""
+            short_desc = clr(f"  {item_desc(item)[:40]}", Color.GREY)
+            print(box_row(f"  {i:2}. {name_str}  {price_str}{affordable}  {type_str}"))
+            print(box_row(f"      {short_desc}{stat_str}"))
 
     print()
     print(box_bottom())
@@ -111,13 +121,34 @@ def _buy(player) -> None:
     """Handle a purchase."""
     stock_items = [ALL_ITEMS.get(k) for k in player.shop_stock if ALL_ITEMS.get(k)]
     if not stock_items:
-        print_message("No hay nada en stock para comprar.", "warning")
+        print_message(t("shop_no_stock"), "warning")
         press_enter()
         return
 
+    print()
+    for i, item in enumerate(stock_items, 1):
+        price = _buy_price(item)
+        rarity_colors = {"common": Color.WHITE, "uncommon": Color.GREEN,
+                         "rare": Color.CYAN, "legendary": Color.YELLOW}
+        name_str  = clr(item.name, rarity_colors.get(item.rarity, Color.WHITE))
+        price_str = clr(f"{price}gp", Color.YELLOW)
+        affordable = "" if player.gold >= price else clr(f" {t('shop_no_afford')}", Color.RED)
+        stats = []
+        if item.attack_bonus:  stats.append(f"ATK+{item.attack_bonus}")
+        if item.defense_bonus: stats.append(f"DEF+{item.defense_bonus}")
+        if item.heal_hp:       stats.append(f"HP+{item.heal_hp}")
+        if item.heal_mp:       stats.append(f"MP+{item.heal_mp}")
+        if item.str_bonus:     stats.append(f"FUE+{item.str_bonus}")
+        if item.dex_bonus:     stats.append(f"DES+{item.dex_bonus}")
+        if item.int_bonus:     stats.append(f"INT+{item.int_bonus}")
+        stat_str = clr("  " + "  ".join(stats), Color.GREEN) if stats else ""
+        print(f"  {i}. {name_str}  {price_str}{affordable}")
+        print(f"     {clr(item_desc(item)[:55], Color.GREY)}{stat_str}")
+    print()
+
     options = [f"{item.name}  ({_buy_price(item)}gp)" for item in stock_items]
-    options.append("-- Cancelar --")
-    choice = prompt_choice(options, "¿Qué comprás?")
+    options.append(t("shop_cancel"))
+    choice = prompt_choice(options, t("shop_buy_prompt"))
 
     if choice == len(options) - 1:
         return
@@ -126,7 +157,7 @@ def _buy(player) -> None:
     price = _buy_price(item)
 
     if not player.spend_gold(price):
-        print_message("Con esa guita no alcanza, flaco.", "warning")
+        print_message(t("shop_no_gold"), "warning")
         press_enter()
         return
 
@@ -134,10 +165,10 @@ def _buy(player) -> None:
     if ok:
         if item.key in player.shop_stock:
             player.shop_stock.remove(item.key)
-        print_message(f"Compraste: {clr(item.name, Color.CYAN)}. Buena elección.", "good")
+        print_message(t("shop_bought", item=clr(item.name, Color.CYAN)), "good")
     else:
         player.earn_gold(price)
-        print_message(f"La mochila está llena. Te devuelvo la guita.", "warning")
+        print_message(t("shop_inventory_full"), "warning")
 
     press_enter()
 
@@ -145,13 +176,13 @@ def _buy(player) -> None:
 def _sell(player) -> None:
     """Handle a sale."""
     if not player.inventory:
-        print_message("No tenés nada para vender. Ni un clavo.", "warning")
+        print_message(t("shop_nothing_sell"), "warning")
         press_enter()
         return
 
     options = [f"{item.name}  ({_sell_price(item)}gp)" for item in player.inventory]
-    options.append("-- Cancelar --")
-    choice = prompt_choice(options, "¿Qué vendés?")
+    options.append(t("shop_cancel"))
+    choice = prompt_choice(options, t("shop_sell_prompt"))
 
     if choice == len(options) - 1:
         return
@@ -160,7 +191,7 @@ def _sell(player) -> None:
     price = _sell_price(item)
     player.remove_from_inventory(item)
     player.earn_gold(price)
-    print_message(f"Vendiste {item.name} por {clr(str(price), Color.YELLOW)}gp. Trato hecho.", "good")
+    print_message(t("shop_sold", item=item.name, price=clr(str(price), Color.YELLOW)), "good")
     press_enter()
 
 
